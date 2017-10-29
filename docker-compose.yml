@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  knowtsharecore:
+    image: knowtsharecore
+    build:
+      context: ./KnowtShareCore
+      dockerfile: Dockerfile
