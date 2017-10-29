@@ -27,7 +27,11 @@ namespace KnowtShareCore
         {
             //services
 
-            services.AddSignalR();
+            services.AddSignalR(options =>
+            {
+                //options.Hubs.EnableDetailedErrors = true;
+            });
+
             services.AddCors(options => {
                 options.AddPolicy("allowAny", x => {
                     x.AllowAnyHeader();
@@ -54,6 +58,8 @@ namespace KnowtShareCore
 
 
             app.UseCors("allowAny");
+
+            app.UseWebSockets();
 
             app.UseSignalR(routes =>
             {
