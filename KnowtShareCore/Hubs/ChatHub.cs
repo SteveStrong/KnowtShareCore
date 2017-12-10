@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.SignalR;
 using System.IO;
 using Newtonsoft.Json;
+using System.Reflection;
+using System;
 
 // https://blogs.msdn.microsoft.com/webdev/2017/09/14/announcing-signalr-for-asp-net-core-2-0/
 // https://damienbod.com/2017/09/12/getting-started-with-signalr-using-asp-net-core-and-angular/
@@ -49,6 +51,16 @@ namespace KnowtShareCore
         {
             // Call the broadcastMessage method to update clients.
             return Clients.All.InvokeAsync("ReceiveFrom", sender, message);
+        }
+
+        public Task Version()
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            var version = assembly.GetName().Version.ToString();
+            var buildDate = ((AssemblyDescriptionAttribute)Attribute.GetCustomAttribute(assembly, typeof(AssemblyDescriptionAttribute))).Description;
+
+            var message = $"{version}: {buildDate}";
+            return Clients.All.InvokeAsync("Version", message);
         }
 
         public Task Broadcast(string channel, object message)
