@@ -57,9 +57,9 @@ namespace KnowtShareCore
         {
             var assembly = Assembly.GetExecutingAssembly();
             var version = assembly.GetName().Version.ToString();
-            var buildDate = ((AssemblyDescriptionAttribute)Attribute.GetCustomAttribute(assembly, typeof(AssemblyDescriptionAttribute))).Description;
+            //var buildDate = ((AssemblyDescriptionAttribute)Attribute.GetCustomAttribute(assembly, typeof(AssemblyDescriptionAttribute))).Description;
 
-            var message = $"{version}: {buildDate}";
+            var message = $"{version}";  // {buildDate}";
             return Clients.All.InvokeAsync("Version", message);
         }
 
