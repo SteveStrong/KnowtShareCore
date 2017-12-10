@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.SignalR;
 using System.IO;
 using Newtonsoft.Json;
+using System.Reflection;
+using System;
 
 // https://blogs.msdn.microsoft.com/webdev/2017/09/14/announcing-signalr-for-asp-net-core-2-0/
 // https://damienbod.com/2017/09/12/getting-started-with-signalr-using-asp-net-core-and-angular/
@@ -51,10 +53,41 @@ namespace KnowtShareCore
             return Clients.All.InvokeAsync("ReceiveFrom", sender, message);
         }
 
+        public Task Version()
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            var version = assembly.GetName().Version.ToString();
+            var buildDate = ((AssemblyDescriptionAttribute)Attribute.GetCustomAttribute(assembly, typeof(AssemblyDescriptionAttribute))).Description;
+
+            var message = $"{version}: {buildDate}";
+            return Clients.All.InvokeAsync("Version", message);
+        }
 
         public Task Broadcast(string channel, object message)
         {
             return Clients.All.InvokeAsync(channel, message);
+        }
+
+        //https://damienbod.com/2017/12/05/sending-direct-messages-using-signalr-with-asp-net-core-and-angular/
+        public Task Command(string channel, object command, object data)
+        {
+            var id = Context.ConnectionId;
+            var list = new string[1] { id };
+
+            return Clients.AllExcept(list).InvokeAsync(channel, command, data);
+        }
+
+        //https://damienbod.com/2017/09/18/signalr-group-messages-with-ngrx-and-angular/
+        public async Task JoinGroup(string groupName)
+        {
+            await Groups.AddAsync(Context.ConnectionId, groupName);
+            await Clients.Group(groupName).InvokeAsync("JoinGroup", groupName);
+        }
+
+        public async Task LeaveGroup(string groupName)
+        {
+            await Clients.Group(groupName).InvokeAsync("LeaveGroup", groupName);
+            await Groups.RemoveAsync(Context.ConnectionId, groupName);
         }
     }
 }

@@ -36,8 +36,7 @@ namespace KnowtShareCore
 
         public override Task OnDisconnectedAsync(System.Exception stopCalled)
         {
-            object value;
-            _connections.TryRemove(Context.ConnectionId, out value);
+            _connections.TryRemove(Context.ConnectionId, out object value);
             var result = Clients.All.InvokeAsync("clientCountChanged", _connections.Count, "disconnected", this.GroupCount.Count);
             base.OnDisconnectedAsync(stopCalled);
             return result;
@@ -66,8 +65,7 @@ namespace KnowtShareCore
 
         public int SessionCount(string sessionKey)
         {
-            int count = 0;
-            GroupCount.TryGetValue(sessionKey, out count);
+            GroupCount.TryGetValue(sessionKey, out int count);
             return count;
         }
 
