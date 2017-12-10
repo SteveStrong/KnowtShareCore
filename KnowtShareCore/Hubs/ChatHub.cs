@@ -51,10 +51,31 @@ namespace KnowtShareCore
             return Clients.All.InvokeAsync("ReceiveFrom", sender, message);
         }
 
-
         public Task Broadcast(string channel, object message)
         {
             return Clients.All.InvokeAsync(channel, message);
+        }
+
+        //https://damienbod.com/2017/12/05/sending-direct-messages-using-signalr-with-asp-net-core-and-angular/
+        public Task Command(string channel, object command, object data)
+        {
+            var id = Context.ConnectionId;
+            var list = new string[1] { id };
+
+            return Clients.AllExcept(list).InvokeAsync(channel, command, data);
+        }
+
+        //https://damienbod.com/2017/09/18/signalr-group-messages-with-ngrx-and-angular/
+        public async Task JoinGroup(string groupName)
+        {
+            await Groups.AddAsync(Context.ConnectionId, groupName);
+            await Clients.Group(groupName).InvokeAsync("JoinGroup", groupName);
+        }
+
+        public async Task LeaveGroup(string groupName)
+        {
+            await Clients.Group(groupName).InvokeAsync("LeaveGroup", groupName);
+            await Groups.RemoveAsync(Context.ConnectionId, groupName);
         }
     }
 }
